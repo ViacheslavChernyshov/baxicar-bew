@@ -3,6 +3,7 @@ package com.baxicar.rest;
 import com.baxicar.model.User;
 import com.baxicar.repository.UserRepository;
 import com.baxicar.security.JwtTokenProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,8 +26,10 @@ import java.util.Map;
 public class AuthenticationRestControllerV1 {
 
     private final AuthenticationManager authenticationManager;
-    private UserRepository userRepository;
-    private JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
+    @Value("${jwt.expiration}")
+    private long validityInMilliseconds;
 
     public AuthenticationRestControllerV1(AuthenticationManager authenticationManager, UserRepository userRepository, JwtTokenProvider jwtTokenProvider) {
         this.authenticationManager = authenticationManager;
@@ -44,6 +47,7 @@ public class AuthenticationRestControllerV1 {
             response.put("email", request.getEmail());
             response.put("token", token);
             response.put("userId", user.getId());
+            response.put("expiresIn", validityInMilliseconds);
             return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {
             return new ResponseEntity<>("Invalid email/password combination", HttpStatus.FORBIDDEN);
