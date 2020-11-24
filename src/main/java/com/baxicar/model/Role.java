@@ -9,13 +9,13 @@ import java.util.stream.Collectors;
 public enum Role {
 
     USER(new HashSet<Permission>() {{
-        add(Permission.DEVELOPERS_READ);
-        add(Permission.DEVELOPERS_WRITE);
+        add(Permission.USERS_READ);
+        add(Permission.USERS_WRITE);
 
     }}),
     ADMIN(new HashSet<Permission>() {{
-        add(Permission.DEVELOPERS_READ);
-        add(Permission.DEVELOPERS_WRITE);
+        add(Permission.USERS_READ);
+        add(Permission.USERS_WRITE);
     }});
 
 //    USER(Set.of(Permission.DEVELOPERS_READ)),
