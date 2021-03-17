@@ -1,23 +1,37 @@
 package com.baxicar.rest.driver;
 
+import com.baxicar.dto.RouteDto;
 import com.baxicar.model.Route;
-import com.baxicar.model.Waypoint;
+import com.baxicar.model.RouteType;
+import com.baxicar.model.User;
+import com.baxicar.security.JwtTokenProvider;
 import com.baxicar.service.RouteService;
+import com.baxicar.service.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/v1/driver")
 @CrossOrigin(origins = "http://localhost:4200")
 public class DriverController {
 
+    private final UserService userService;
     private final RouteService routeService;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public DriverController(RouteService routeService) {
+    public DriverController(UserService userService, RouteService routeService, JwtTokenProvider jwtTokenProvider) {
+        this.userService = userService;
         this.routeService = routeService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 //
 //    @PreAuthorize("hasRole('DRIVER') or hasRole('ADMIN')")
@@ -30,19 +44,30 @@ public class DriverController {
     //@PreAuthorize("hasRole('DRIVER') or hasRole('ADMIN')")
     @PreAuthorize("hasAuthority('users:write')")
     @PostMapping("/addDriverRoute")
-    public Route addDriverRoute(@RequestBody Route route) {
-        ArrayList<Waypoint> waypoints = new ArrayList<>(route.getWaypoint());
-        route.setWaypoint(waypoints);
-        Route routez = routeService.save(route);
-        System.out.println(routez);
-        return null;
+    public ResponseEntity<?> addDriverRoute(@RequestBody RouteDto routeDto, ServletRequest servletRequest) {
+        String token = jwtTokenProvider.resolveToken((HttpServletRequest) servletRequest);
+        Long tokenUserid = Long.valueOf(jwtTokenProvider.getUserId(token));
+        if (tokenUserid != null && tokenUserid.equals(routeDto.getUserId())) {
+            System.out.println("USER_ID: - " + jwtTokenProvider.getUserId(token));
+            Long userid = routeDto.getUserId();
+            User user = userService.findByUserId(userid);
+            Route route = routeDto.toRoute();
+            route.setUser(user);
+            route.setRouteType(RouteType.D);
+            routeService.save(route);
+            return new ResponseEntity<>("Save successes", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Bad request", HttpStatus.BAD_REQUEST);
     }
 
     @PreAuthorize("hasAuthority('users:write')")
-    @GetMapping("/getRoutesByDriverId")
-    public List<Route> create(@RequestBody Long id) {
-        List<Route> routes = routeService.getRoutesByUserId(id);
-        return routes;
+    @GetMapping("/routes/{id}")
+    public ResponseEntity<?> getRoutesByDriverId(@PathVariable("id") Long id) {
+        List<RouteDto> routes = routeService.getRoutesByUserId(id);
+
+        Map<Object, Object> response = new HashMap<>();
+        response.put("routes", routes);
+        return ResponseEntity.ok(routes);
     }
 
 

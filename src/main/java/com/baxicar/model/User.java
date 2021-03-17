@@ -1,19 +1,10 @@
 package com.baxicar.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
+import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.Past;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -24,7 +15,7 @@ import java.util.Date;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
     @Column(name = "email")
     private String email;
     @Column(name = "password")
@@ -45,5 +36,18 @@ public class User {
     private Status status;
     @Column(name = "active")
     private Boolean active;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<Route> routes;
+
+    public void setRoutes(List<Route> routes) {
+        if (routes != null) {
+            routes.forEach(a -> {
+                a.setUser(this);
+            });
+        }
+        this.routes = routes;
+    }
 }
 

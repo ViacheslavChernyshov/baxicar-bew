@@ -6,7 +6,9 @@ import com.baxicar.model.User;
 public interface UserService {
     User create(User user);
 
-    // Optional<User> findByEmail(String email);
+    User save(User user);
+
+    User findByUserId(Long userId);
 
     User findByEmailAndActiveTrue(String email);
 

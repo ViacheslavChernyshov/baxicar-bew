@@ -1,9 +1,15 @@
 package com.baxicar.service;
 
+import com.baxicar.dto.RouteDto;
 import com.baxicar.model.Route;
 import com.baxicar.repository.RouteRepository;
+import org.springframework.data.annotation.Persistent;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,13 +23,28 @@ public class RouteServiceImpl implements RouteService {
     }
 
     @Override
+
     public Route save(Route route) {
-        return routeRepository.save(route);
+        return routeRepository.saveAndFlush(route);
     }
 
     @Override
-    public List<Route> getRoutesByUserId(Long userId) {
-        return routeRepository.findAllById(Collections.singleton(userId));
+    public List<RouteDto> getRoutesByUserId(Long userId) {
+        List<Route> routes = routeRepository.findByUserUserId(userId);
+
+        List<RouteDto> routesDto = new ArrayList<>();
+        for (Route route : routes) {
+            route.getUser();
+            RouteDto routeDto = route.toRouteDto();
+            routesDto.add(routeDto);
+        }
+
+        return routesDto;
+    }
+
+    @Override
+    public List<RouteDto> getRouteByUserId(Long userId) {
+        return null;
     }
 
 //    @Override

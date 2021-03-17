@@ -1,5 +1,6 @@
 package com.baxicar.model;
 
+import com.baxicar.dto.WaypointDto;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -21,35 +22,14 @@ public class Waypoint {
     @JoinColumn(name = "route_id")
     private Route route;
 
-//    public Long getWaypointsId() {
-//        return waypointsId;
-//    }
-//
-//    public void setWaypointsId(Long waypointsId) {
-//        this.waypointsId = waypointsId;
-//    }
-//
-//    public Double getLatitude() {
-//        return latitude;
-//    }
-//
-//    public void setLatitude(Double latitude) {
-//        this.latitude = latitude;
-//    }
-//
-//    public Double getLongitude() {
-//        return longitude;
-//    }
-//
-//    public void setLongitude(Double longitude) {
-//        this.longitude = longitude;
-//    }
-//
-//    public Route getRoute() {
-//        return route;
-//    }
-//
-    public void setRoute(Route route) {
-        this.route = route;
+    public WaypointDto toWaypoints() {
+
+        WaypointDto waypointDto = new WaypointDto();
+        waypointDto.setWaypointsId(waypointsId);
+        waypointDto.setRouteId(getRoute().getRouteId());
+        waypointDto.setLatitude(getLatitude());
+        waypointDto.setLongitude(getLongitude());
+        return waypointDto;
     }
+
 }
