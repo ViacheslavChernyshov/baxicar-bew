@@ -24,7 +24,7 @@ public class Route {
     @Column(name = "route_id")
     private Long routeId;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -51,7 +51,6 @@ public class Route {
     private LocalDateTime lmDate;
 
     @OneToMany(mappedBy = "route", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @JoinColumn(name = "route_id")
     @ToString.Exclude
     private List<Waypoint> waypoints;
 

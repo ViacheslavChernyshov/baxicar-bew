@@ -10,6 +10,7 @@ import com.baxicar.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletRequest;
@@ -17,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 @RestController
 @RequestMapping("/api/v1/driver")
@@ -33,17 +33,10 @@ public class DriverController {
         this.routeService = routeService;
         this.jwtTokenProvider = jwtTokenProvider;
     }
-//
-//    @PreAuthorize("hasRole('DRIVER') or hasRole('ADMIN')")
-//    @RequestMapping(value = "/user", method = RequestMethod.GET)
-//    public List<User> listUser() {
-//        return userService.findAll();
-//    }
-
 
     //@PreAuthorize("hasRole('DRIVER') or hasRole('ADMIN')")
     @PreAuthorize("hasAuthority('users:write')")
-    @PostMapping("/addDriverRoute")
+    @PostMapping("/route")
     public ResponseEntity<?> addDriverRoute(@RequestBody RouteDto routeDto, ServletRequest servletRequest) {
         String token = jwtTokenProvider.resolveToken((HttpServletRequest) servletRequest);
         Long tokenUserid = Long.valueOf(jwtTokenProvider.getUserId(token));
@@ -70,24 +63,18 @@ public class DriverController {
         return ResponseEntity.ok(routes);
     }
 
-
-//    @PreAuthorize("hasRole('DRIVER')")
-//    @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
-//    public User findOne(@PathVariable long id) {
-//        return userService.findOne(id);
-//    }
-//
-//    @PreAuthorize("hasRole('ADMIN')")
-//    //@Secured("ROLE_ADMIN")
-//    @RequestMapping(value = "/user/{id}", method = RequestMethod.PUT)
-//    public User update(@PathVariable long id, @RequestBody User user) {
-//        user.setId(id);
-//        return userService.save(user);
-//    }
-//
-//    @RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE)
-//    public void delete(@PathVariable(value = "id") Long id) {
-//        userService.delete(id);
-//    }
-
+    @PreAuthorize("hasAuthority('users:write')")
+    @DeleteMapping("/route/{id}")
+    @Transactional
+    public ResponseEntity<?> deleteRouteByRouteId(@PathVariable("id") Long id, ServletRequest servletRequest) {
+        String token = jwtTokenProvider.resolveToken((HttpServletRequest) servletRequest);
+        Long tokenUserid = Long.valueOf(jwtTokenProvider.getUserId(token));
+        if (tokenUserid != null && id != null) {
+            Long result = routeService.deleteRouteByRouteId(id);
+            if (result == 0) {
+                return ResponseEntity.ok(HttpStatus.NOT_FOUND);
+            }
+            return ResponseEntity.ok(HttpStatus.OK);
+        } else return new ResponseEntity<>("Bad request", HttpStatus.BAD_REQUEST);
+    }
 }

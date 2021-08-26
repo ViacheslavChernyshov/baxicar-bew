@@ -16,11 +16,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -36,10 +34,9 @@ public class UserRestController {
         this.passwordEncoder = passwordEncoder;
     }
 
-
     @PostMapping("/signup")
     // @PreAuthorize("hasAuthority('developers:write')")
-    public ResponseEntity<Object> addDriverRoute(@Valid @RequestBody RegistrationUserDto userDto, Errors errors) {
+    public ResponseEntity<Object> signup(@Valid @RequestBody RegistrationUserDto userDto, Errors errors) {
         Map<Object, Object> response = new HashMap<>();
 
         if (userDto != null && errors.hasErrors()) {
@@ -67,32 +64,4 @@ public class UserRestController {
         }
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
-
-//    @GetMapping
-//    public List<User> getAll() {
-//        return DEVELOPERS;
-//    }
-//
-//    @GetMapping("/{id}")
-//    @PreAuthorize("hasAuthority('developers:read')")
-//    public User getById(@PathVariable Long id) {
-//        return DEVELOPERS.stream().filter(developer -> developer.getId().equals(id))
-//                .findFirst()
-//                .orElse(null);
-//    }
-//
-//    @PostMapping
-//    @PreAuthorize("hasAuthority('developers:write')")
-//    public User create(@RequestBody Developer developer) {
-//        this.DEVELOPERS.add(developer);
-//        return developer;
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    @PreAuthorize("hasAuthority('developers:write')")
-//    public void deleteById(@PathVariable Long id) {
-//        this.DEVELOPERS.removeIf(developer -> developer.getId().equals(id));
-//    }
-
-
 }
